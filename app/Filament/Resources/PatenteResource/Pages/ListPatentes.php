@@ -14,6 +14,12 @@ class ListPatentes extends ListRecords
     {
         return [
             Actions\CreateAction::make(),
+            Actions\Action::make('UploadPatente') // Botón personalizado "Search Patente"
+                ->label('Upload Patente')
+                ->color('success') // Color del botón
+                ->icon('heroicon-o-magnifying-glass') // Ícono del botón
+                ->url(route('filament.admin.resources.patentes.upload'))
+                ->tooltip('Cargar imagen de patente'), // Tooltip del botón
         ];
     }
 }

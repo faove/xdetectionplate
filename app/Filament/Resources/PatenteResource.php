@@ -2,16 +2,17 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PatenteResource\Pages;
-use App\Filament\Resources\PatenteResource\RelationManagers;
-use App\Models\Patente;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Patente;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\PatenteResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\PatenteResource\RelationManagers;
 
 class PatenteResource extends Resource
 {
@@ -62,6 +63,9 @@ class PatenteResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Action::make('delete')
+                    ->requiresConfirmation()
+                    ->action(fn (Patente $record) => $record->delete())
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -83,6 +87,7 @@ class PatenteResource extends Resource
             'index' => Pages\ListPatentes::route('/'),
             'create' => Pages\CreatePatente::route('/create'),
             'edit' => Pages\EditPatente::route('/{record}/edit'),
+            'upload' => Pages\UploadPatente::route('/upload'),
         ];
     }
 }

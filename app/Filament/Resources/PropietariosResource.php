@@ -23,7 +23,13 @@ class PropietariosResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Forms\Components\TextInput::make('dominio')
+                    ->required()
+                    ->maxLength(9),
+                Forms\Components\TextInput::make('email')
+                    ->required(),
+                Forms\Components\TextInput::make('name'),
+                Forms\Components\TextInput::make('phone'),
             ]);
     }
 
@@ -31,7 +37,11 @@ class PropietariosResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('dominio')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('email'),
+                Tables\Columns\TextColumn::make('name'),
+                Tables\Columns\TextColumn::make('phone'),
             ])
             ->filters([
                 //
