@@ -97,6 +97,19 @@ return [
             'sslmode' => 'prefer',
         ],
 
+        'pgsql_second' => [
+            'driver' => 'pgsql',
+            'host' => env('DB_SECOND_HOST', '127.0.0.1'),
+            'port' => env('DB_SECOND_PORT', '5432'),
+            'database' => env('DB_SECOND_DATABASE', 'sam_cordoba_trib_test'),
+            'username' => env('DB_SECOND_USERNAME', 'webusr'),
+            'password' => env('DB_SECOND_PASSWORD', 'clonagin'),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'schema' => 'public',
+            'sslmode' => 'prefer',
+        ],
+
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),
