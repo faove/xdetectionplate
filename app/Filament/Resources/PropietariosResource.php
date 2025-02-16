@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Actions\Action;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -23,13 +24,16 @@ class PropietariosResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('dominio')
-                    ->required()
-                    ->maxLength(9),
+                Forms\Components\TextInput::make('num_ndoc')
+                    ->required(),
+                Forms\Components\TextInput::make('num_cuit'),
+                Forms\Components\TextInput::make('name'),
                 Forms\Components\TextInput::make('email')
                     ->required(),
-                Forms\Components\TextInput::make('name'),
+                Forms\Components\TextInput::make('domicilio'),
                 Forms\Components\TextInput::make('phone'),
+                Forms\Components\TextInput::make('obj_id'),
+                Forms\Components\TextInput::make('num'),
             ]);
     }
 
@@ -37,10 +41,15 @@ class PropietariosResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('dominio')
+                Tables\Columns\TextColumn::make('num_ndoc')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email'),
+                Tables\Columns\TextColumn::make('num_cuit')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('name'),
+                Tables\Columns\TextColumn::make('domicilio'),
+                Tables\Columns\TextColumn::make('obj_id'),
+                Tables\Columns\TextColumn::make('num'),
+                Tables\Columns\TextColumn::make('email'),
                 Tables\Columns\TextColumn::make('phone'),
             ])
             ->filters([
@@ -48,6 +57,9 @@ class PropietariosResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Action::make('delete')
+                    ->requiresConfirmation()
+                    ->action(fn (Propietarios $record) => $record->delete())
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

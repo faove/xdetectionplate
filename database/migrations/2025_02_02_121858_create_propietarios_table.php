@@ -13,10 +13,15 @@ return new class extends Migration
     {
         Schema::create('propietarios', function (Blueprint $table) {
             $table->id();
-            $table->string('email');
+            $table->string('num_ndoc')->nullable();
+            $table->string('num_cuit')->nullable();
             $table->string('name');
-            $table->string('phone');
-            $table->string('dominio', 9);
+            $table->string('email')->nullable();
+            $table->string('domicilio')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('obj_id', 8)->nullable(); //R0129777
+            $table->string('num', 8)->nullable(); //P0376474            
+            $table->string('status', 1)->nullable(); //P0376474            
             $table->timestamps();
         });
     }

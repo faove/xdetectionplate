@@ -14,15 +14,15 @@ return new class extends Migration
         Schema::create('patentes', function (Blueprint $table) {
             $table->id();
             $table->string('dominio', 9);            
-            $table->date('fchregistro');            
-            $table->integer('marca'); 
-            $table->integer('modelo'); 
+            $table->integer('marca')->nullable(); 
+            $table->integer('modelo')->nullable(); 
             $table->string('marca_name')->nullable();
             $table->string('modelo_name')->nullable();
             $table->string('nromotor')->nullable();
             $table->string('nrochasis')->nullable();
-            $table->integer('anio');
+            $table->integer('anio')->nullable();
             $table->string('color', 15)->nullable();
+            $table->date('fchregistro');            
             $table->string('obj_id', 8)->nullable();
             $table->string('imagen')->nullable();
             $table->string('video')->nullable();
