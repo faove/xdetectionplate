@@ -6,12 +6,14 @@ use App\Models\Rodado;
 use App\Models\Patente;
 use Filament\Forms\Form;
 use App\Models\ViewRodado;
+use App\Models\ViewPersona;
+use App\Models\Propietarios;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\Page;
 use Illuminate\Contracts\View\View;
+
 use Illuminate\Support\Facades\Http;
 use Filament\Forms\Contracts\HasForms;
-
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\FileUpload;
@@ -75,20 +77,16 @@ class UploadPatente extends Page
 
         // Obtiene la imagen subida
         $imagen = $formState['imagen'][0];
-
-
-        // Mostrar el valor obtenido
-        // dd($imagen);
-
         // Construye la URL completa del archivo
         $imagePath = storage_path('app/public/' . $imagen); // Ajusta la ruta si es necesario
-        //dd($imagePath);
         // Enviar la imagen a FastAPI
-        $response = Http::post('http://127.0.0.1:5000/detection_plate', [
-            'image_path' => $imagePath,
-            'confidence' => 0.25,
+        $response = Http::attach(
+            'file',  // Debe coincidir con el nombre en FastAPI
+            file_get_contents($imagePath),
+            basename($imagePath)
+        )->post('http://127.0.0.1:5000/detection_plate', [
+            'confidence' => 0.5,  // Se envía como parámetro separado
         ]);
-        // $response = Http::get('http://127.0.0.1:5000/');
 
         // Manejo de respuesta
         if ($response->successful()) {
@@ -99,12 +97,10 @@ class UploadPatente extends Page
 
                 $plate = $data['results'][0]['plate'] ?? null;
 
-                //dump($plate);
-
                 // Obtener el rodado asociado al dominio
                 $rodado = ViewRodado::where('dominio', strtoupper($plate))->first();
 
-                if (isset($rodado['num'])) {
+                if (isset($rodado['dominio'])) {
                     $patente  = Patente::where('dominio', strtoupper($plate))->first();
                 
                     if ($patente) {
@@ -124,18 +120,46 @@ class UploadPatente extends Page
                             'marca_name' => $rodado['marca_nom'],
                             'modelo_name' => $rodado['modelo_nom'],
                             'anio' => $rodado['anio'],
+                            'color' => $rodado['color'],
+                            'nromotor' => $rodado['nromotor'],
                             'obj_id' => $rodado['obj_id'],
                             'imagen' => $imagePath,
                         ]);
                         $patente->save();
-                        // Guardar los datos de la persona asociada al rodado
-                        //$persona = Persona::where('id', $rodado['persona_id'])->first();
+
+                        // dump($rodado['num_ndoc']);
+                        $persona = ViewPersona::where('obj_id', $rodado['num'])->first();
+
+                        if (isset($persona['obj_id'])) {        
+                            // Guardar los datos de la persona asociada al rodado
+                            $propietario = Propietarios::where('num_ndoc', $rodado['num_ndoc'])->first();
+                            if ($propietario) {
+                                Notification::make()
+                                    ->title('Error')
+                                    ->body('El propietario ya existe.')
+                                    ->danger()
+                                    ->send();
+                                return;
+                            } else {
+                                // Crear un nuevo propietario con los datos del rodado
+                                $propiet = Propietarios::create([
+                                    'num_ndoc' => $rodado['num_ndoc'],
+                                    'num_cuit' => $rodado['num_cuit'],
+                                    'name' => $rodado['nombre'],
+                                    'email' => $persona['mail'],
+                                    'domicilio' => $persona['dompos_dir'],
+                                    'phone' => $persona['tel'],
+                                    'obj_id' => $persona['obj_id'],
+                                    'num' => $rodado['num'],
+                                    'status' => $rodado['est'],
+                                ]);
+                                $propiet->save();
+                            }
+                        }
                         // Redirigir a la página de detalles de la patente
                         //return redirect()->route('filament.resources.patente.edit', ['record' => $patente->id]);
                     }
                 }
-
-                //dd($rodado);
 
                 Notification::make()
                     ->title('Éxito')
