@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
+use App\Filament\Pages\VerFacilidades;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\PatenteResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -63,6 +64,11 @@ class PatenteResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Action::make('verFacilidades')
+                    ->label('Ver Facilidades')
+                    ->icon('heroicon-o-eye')
+                    ->url(fn (Patente $record): string => VerFacilidades::getUrl(['obj_id' => $record->obj_id])),
+                    // ->url(fn (VerFacilidades $record): string => route('pages.ver-facilidades', ['obj_id' => $record->obj_id])),
                 Action::make('delete')
                     ->requiresConfirmation()
                     ->action(fn (Patente $record) => $record->delete())
